@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/sprig"
 	"html/template"
+	apiextv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"regexp"
 
@@ -63,6 +64,8 @@ func BuildObjectsFromTemplates(templatesMap map[string]string, data interface{})
 	if err != nil {
 		return nil, nil, err
 	}
+
+	_ = apiextv1beta1.AddToScheme(scheme.Scheme)
 
 	// Deserializing all kube objects from parsedTemplates
 	// see https://github.com/kubernetes/client-go/issues/193 for examples

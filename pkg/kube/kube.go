@@ -1,6 +1,7 @@
 package kube
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	v1 "k8s.io/api/core/v1"
@@ -74,7 +75,7 @@ func (k *kube) buildClient() (*kubernetes.Clientset, error) {
 
 func (k *kube) NamespaceExists() (bool, error) {
 	var exists = false
-	namespace, err := k.clientSet.CoreV1().Namespaces().Get(k.namespace, metav1.GetOptions{})
+	namespace, err := k.clientSet.CoreV1().Namespaces().Get(context.TODO(), k.namespace, metav1.GetOptions{})
 	if err != nil {
 		return exists, err
 	}
@@ -90,7 +91,7 @@ func (k *kube) CreateNamespace() error {
 			Name: k.namespace,
 		},
 	}
-	_, err := k.clientSet.CoreV1().Namespaces().Create(&namespace)
+	_, err := k.clientSet.CoreV1().Namespaces().Create(context.TODO(), &namespace, metav1.CreateOptions{})
 	return err
 }
 
@@ -112,7 +113,7 @@ func (k *kube) CreateResources(manifestPath string) error {
 	}
 
 	var resources = v1.ResourceQuota{}
-	_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(&resources)
+	_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(context.TODO(), &resources, metav1.CreateOptions{})
 	return err
 }
 
