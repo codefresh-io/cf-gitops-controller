@@ -29,6 +29,7 @@ type (
 		namespace        string
 		pathToKubeConfig string
 		clientSet        *kubernetes.Clientset
+		ctx              context.Context
 	}
 
 	Options struct {
@@ -43,6 +44,7 @@ func New(o *Options) (Kube, error) {
 		contextName:      o.ContextName,
 		namespace:        o.Namespace,
 		pathToKubeConfig: o.PathToKubeConfig,
+		ctx:              context.Background(),
 	}
 	clientSet, err := client.buildClient()
 
@@ -75,7 +77,7 @@ func (k *kube) buildClient() (*kubernetes.Clientset, error) {
 
 func (k *kube) NamespaceExists() (bool, error) {
 	var exists = false
-	namespace, err := k.clientSet.CoreV1().Namespaces().Get(context.TODO(), k.namespace, metav1.GetOptions{})
+	namespace, err := k.clientSet.CoreV1().Namespaces().Get(k.ctx, k.namespace, metav1.GetOptions{})
 	if err != nil {
 		return exists, err
 	}
@@ -91,7 +93,7 @@ func (k *kube) CreateNamespace() error {
 			Name: k.namespace,
 		},
 	}
-	_, err := k.clientSet.CoreV1().Namespaces().Create(context.TODO(), &namespace, metav1.CreateOptions{})
+	_, err := k.clientSet.CoreV1().Namespaces().Create(k.ctx, &namespace, metav1.CreateOptions{})
 	return err
 }
 
@@ -113,7 +115,7 @@ func (k *kube) CreateResources(manifestPath string) error {
 	}
 
 	var resources = v1.ResourceQuota{}
-	_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(context.TODO(), &resources, metav1.CreateOptions{})
+	_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(k.ctx, &resources, metav1.CreateOptions{})
 	return err
 }
 
