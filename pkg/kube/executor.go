@@ -28,7 +28,7 @@ func ExecuteTemplate(tplStr string, data interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-// ParseTemplates - parses and exexute templates and return map of strings with obj data
+// ParseTemplates - parses and exexute templates and return map of strings with kubeobj data
 func ParseTemplates(templatesMap map[string]string, data interface{}) (map[string]string, error) {
 	parsedTemplates := make(map[string]string)
 	nonEmptyParsedTemplateFunc := regexp.MustCompile(`[a-zA-Z0-9]`).MatchString

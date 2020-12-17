@@ -42,9 +42,12 @@ var installCmd = &cobra.Command{
 		}
 
 		logger.Info(fmt.Sprint("Creating argocd resources..."))
-		// @todo
-		_ = kubeClient.CreateResources(installCmdOptions.ManifestPath)
-		// cp.execSync(`kubectl apply -n "${namespace}" -f "${manifest}"`, { stdio: 'inherit' });
+		err = kubeClient.CreateResources(installCmdOptions.ManifestPath)
+		if err != nil {
+			msg := fmt.Sprint("Can't create argocd resources")
+			//sendControllerInstalledEvent(FAILED, msg)
+			return errors.New(msg)
+		}
 
 		logger.Info(fmt.Sprint("Changing service type to \"LoadBalancer\"..."))
 		// @todo
@@ -107,7 +110,7 @@ func init() {
 	if currentUser != nil {
 		kubeConfigPath = os.Getenv("KUBECONFIG")
 		if kubeConfigPath == "" {
-			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config-cf")
+			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config")
 		}
 	}
 

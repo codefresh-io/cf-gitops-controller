@@ -3,8 +3,11 @@ package kube
 import (
 	"context"
 	"fmt"
+	kubeobj "github.com/codefresh-io/cf-gitops-controller/pkg/kube/kubeobj"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
 	"io/ioutil"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -12,6 +15,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -77,7 +81,7 @@ func (k *kube) buildClient() (*kubernetes.Clientset, error) {
 
 func (k *kube) NamespaceExists() (bool, error) {
 	var exists = false
-	namespace, err := k.clientSet.CoreV1().Namespaces().Get(k.ctx, k.namespace, metav1.GetOptions{})
+	namespace, err := k.clientSet.CoreV1().Namespaces().Get(k.namespace, metav1.GetOptions{})
 	if err != nil {
 		return exists, err
 	}
@@ -93,7 +97,7 @@ func (k *kube) CreateNamespace() error {
 			Name: k.namespace,
 		},
 	}
-	_, err := k.clientSet.CoreV1().Namespaces().Create(k.ctx, &namespace, metav1.CreateOptions{})
+	_, err := k.clientSet.CoreV1().Namespaces().Create(&namespace)
 	return err
 }
 
@@ -105,17 +109,31 @@ func (k *kube) CreateResources(manifestPath string) error {
 	}
 	var templatesValues map[string]interface{}
 
-	kubeObjects, parsedTemplates, err := BuildObjectsFromTemplates(templatesMap, templatesValues)
-	if kubeObjects != nil {
-		fmt.Print(parsedTemplates)
-	}
+	kubeObjects, _, err := BuildObjectsFromTemplates(templatesMap, templatesValues)
 	if err != nil {
-		// @todo
-		fmt.Print(parsedTemplates)
+		return err
 	}
 
-	var resources = v1.ResourceQuota{}
-	_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(k.ctx, &resources, metav1.CreateOptions{})
+	kubeObjectKeys := reflect.ValueOf(kubeObjects).MapKeys()
+
+	for _, key := range kubeObjectKeys {
+		kind, name, createErr := kubeobj.CreateObject(k.clientSet, kubeObjects[key.String()], k.namespace)
+
+		if createErr == nil {
+			// skip, everything ok
+		} else if statusError, errIsStatusError := createErr.(*errors.StatusError); errIsStatusError {
+			if statusError.ErrStatus.Reason == metav1.StatusReasonAlreadyExists {
+				logger.Warning(fmt.Sprintf("%s \"%s\" already exists", kind, name))
+			} else {
+				logger.Error(fmt.Sprintf("%s \"%s\" failed: %v ", kind, name, statusError))
+				return statusError
+			}
+		} else {
+			logger.Error(fmt.Sprintf("%s \"%s\" failed: %v ", kind, name, createErr))
+			return createErr
+		}
+	}
+	//_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(&resources, metav1.CreateOptions{})
 	return err
 }
 
