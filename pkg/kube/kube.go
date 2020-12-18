@@ -2,12 +2,14 @@ package kube
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	kubeobj "github.com/codefresh-io/cf-gitops-controller/pkg/kube/kubeobj"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
 	"io/ioutil"
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -23,9 +25,14 @@ import (
 type (
 	Kube interface {
 		buildClient() (*kubernetes.Clientset, error)
-		CreateResources(string) error
+
 		CreateNamespace() error
 		NamespaceExists() (bool, error)
+		GetArgoServerHost() (string, error)
+
+		CreateDeployments(string) error
+		UpdateDeployments(*appsv1.DeploymentList) error
+		GetDeployments(string) (*appsv1.DeploymentList, error)
 	}
 
 	kube struct {
@@ -101,7 +108,21 @@ func (k *kube) CreateNamespace() error {
 	return err
 }
 
-func (k *kube) CreateResources(manifestPath string) error {
+func (k *kube) GetDeployments(labelSelector string) (*appsv1.DeploymentList, error) {
+	return kubeobj.GetDeployments(k.clientSet, k.namespace, labelSelector)
+}
+
+func (k *kube) UpdateDeployments(deploymentList *appsv1.DeploymentList) error {
+	for _, deployment := range deploymentList.Items {
+		_, err := kubeobj.UpdateDeployment(k.clientSet, &deployment, k.namespace)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (k *kube) CreateDeployments(manifestPath string) error {
 	var err error
 	templatesMap, err := buildTemplatesFromManifest(manifestPath)
 	if err != nil {
@@ -121,7 +142,7 @@ func (k *kube) CreateResources(manifestPath string) error {
 
 		if createErr == nil {
 			// skip, everything ok
-		} else if statusError, errIsStatusError := createErr.(*errors.StatusError); errIsStatusError {
+		} else if statusError, errIsStatusError := createErr.(*k8sErrors.StatusError); errIsStatusError {
 			if statusError.ErrStatus.Reason == metav1.StatusReasonAlreadyExists {
 				logger.Warning(fmt.Sprintf("%s \"%s\" already exists", kind, name))
 			} else {
@@ -133,7 +154,6 @@ func (k *kube) CreateResources(manifestPath string) error {
 			return createErr
 		}
 	}
-	//_, err = k.clientSet.CoreV1().ResourceQuotas(k.namespace).Create(&resources, metav1.CreateOptions{})
 	return err
 }
 
@@ -154,6 +174,29 @@ func buildTemplatesFromManifest(manifestPath string) (map[string]string, error) 
 		templatesMap["template_"+strconv.Itoa(n)+".yaml"] = tpl
 	}
 	return templatesMap, err
+}
+
+func (k *kube) GetArgoServerHost() (string, error) {
+	opts := metav1.ListOptions{LabelSelector: "app.kubernetes.io/name=argocd-server"}
+	svcs, err := k.clientSet.CoreV1().Services(k.namespace).List(opts)
+
+	if err != nil {
+		return "", err
+	}
+	if svcs == nil || len(svcs.Items) == 0 {
+		return "", errors.New(fmt.Sprint("Invalid svcs"))
+	}
+
+	ingress := svcs.Items[0].Status.LoadBalancer.Ingress[0]
+
+	if ingress.Hostname != "" {
+		return "https://" + ingress.Hostname, nil
+	}
+	if ingress.IP != "" {
+		return "https://" + ingress.IP, nil
+	}
+
+	return "", errors.New(fmt.Sprint("Can't resolve Ingress Hostname or IP"))
 }
 
 func downloadManifest(url string) ([]byte, error) {
