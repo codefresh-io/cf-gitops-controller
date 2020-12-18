@@ -1,0 +1,38 @@
+package questionnaire
+
+import (
+	"errors"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/prompt"
+)
+
+func AskAboutPass(installOptions *install.CmdOptions) error {
+	i := 1
+	var MaxRetry = 10
+	if installOptions.Argo.Password != "" {
+		return nil
+	}
+
+	for i < MaxRetry {
+		installOptions.Argo.Password = askAboutPass()
+		if installOptions.Argo.Password != "" {
+			return nil
+		}
+	}
+
+	return errors.New("passwords are different")
+}
+
+func askAboutPass() string {
+	var firstPassword string
+	var secondPassword string
+
+	_ = prompt.InputPassword(&firstPassword, "Argo password")
+	_ = prompt.InputPassword(&secondPassword, "Confirm password")
+	if firstPassword != secondPassword {
+		logger.Error("Passwords are different")
+		return ""
+	}
+	return firstPassword
+}
