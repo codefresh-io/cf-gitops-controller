@@ -53,10 +53,12 @@ var installCmd = &cobra.Command{
 		logger.Info(fmt.Sprint("Changing service type to \"LoadBalancer\"..."))
 
 		argocdServer, err := kubeClient.GetService("app.kubernetes.io/name=argocd-server")
-		if err == nil {
-			argocdServer.Spec.Type = "LoadBalancer"
-			err = kubeClient.UpdateService(argocdServer)
+		if err != nil {
+			return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
 		}
+
+		argocdServer.Spec.Type = "LoadBalancer"
+		err = kubeClient.UpdateService(argocdServer)
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
 		}

@@ -105,7 +105,7 @@ func GetAllContexts(pathToKubeConfig string) ([]string, error) {
 func (k *kube) CreateNamespace(namespaceName string) error {
 	namespace, err := k.clientSet.CoreV1().Namespaces().Get(namespaceName, metav1.GetOptions{})
 
-	if namespace != nil {
+	if namespace != nil && namespace.Status.Phase == "Active" {
 		k.namespace = namespaceName
 		return nil
 	}
