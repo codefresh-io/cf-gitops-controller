@@ -2,6 +2,8 @@ package prompt
 
 import (
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/AlecAivazis/survey/v2/terminal"
+	"os"
 )
 
 func InputWithDefault(target *string, label string, defaultValue string) error {
@@ -15,7 +17,9 @@ func InputWithDefault(target *string, label string, defaultValue string) error {
 	}
 
 	err := survey.AskOne(prompt, target)
-
+	if err == terminal.InterruptErr {
+		os.Exit(0)
+	}
 	if err != nil {
 		return err
 	}
@@ -29,11 +33,13 @@ func InputPassword(target *string, label string) error {
 	}
 
 	prompt := &survey.Password{
-		Message: label,
+		Message: label + "\n",
 	}
 
 	err := survey.AskOne(prompt, target)
-
+	if err == terminal.InterruptErr {
+		os.Exit(0)
+	}
 	if err != nil {
 		return err
 	}
@@ -51,7 +57,9 @@ func Input(target *string, label string) error {
 	}
 
 	err := survey.AskOne(prompt, target)
-
+	if err == terminal.InterruptErr {
+		os.Exit(0)
+	}
 	if err != nil {
 		return err
 	}
@@ -67,7 +75,9 @@ func Confirm(label string) (error, bool) {
 	}
 
 	err := survey.AskOne(prompt, &result)
-
+	if err == terminal.InterruptErr {
+		os.Exit(0)
+	}
 	if err != nil {
 		return err, false
 	}
@@ -89,7 +99,9 @@ func Multiselect(items []string, label string) (error, []string) {
 	}
 
 	err := survey.Ask(multiQs, &result)
-
+	if err == terminal.InterruptErr {
+		os.Exit(0)
+	}
 	if err != nil {
 		return err, nil
 	}
@@ -106,7 +118,9 @@ func Select(items []string, label string) (error, string) {
 	}
 
 	err := survey.AskOne(prompt, &result)
-
+	if err == terminal.InterruptErr {
+		os.Exit(0)
+	}
 	if err != nil {
 		return err, ""
 	}

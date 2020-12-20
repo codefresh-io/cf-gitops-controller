@@ -9,12 +9,13 @@ import (
 
 func AskAboutPass(installOptions *install.CmdOptions) error {
 	i := 1
-	var MaxRetry = 10
+	var MaxRetry = 3
 	if installOptions.Argo.Password != "" {
 		return nil
 	}
 
 	for i < MaxRetry {
+		i++
 		installOptions.Argo.Password = askAboutPass()
 		if installOptions.Argo.Password != "" {
 			return nil
