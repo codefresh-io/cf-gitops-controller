@@ -38,13 +38,9 @@ var installCmd = &cobra.Command{
 		}
 
 		_ = questionnaire.AskAboutNamespace(&installCmdOptions, kubeClient)
-		namespaceIsExist, err := kubeClient.NamespaceExists()
-		if namespaceIsExist != true {
-			logger.Info(fmt.Sprintf("Creating namespace \"%s\"...", installCmdOptions.Kube.Namespace))
-			err = kubeClient.CreateNamespace()
-			if err != nil {
-				return failInstallation(fmt.Sprintf("Can't create namespace %s: \"%s\"", installCmdOptions.Kube.Namespace, err.Error()))
-			}
+		err = kubeClient.CreateNamespace(installCmdOptions.Kube.Namespace)
+		if err != nil {
+			return failInstallation(fmt.Sprintf("Can't create namespace %s: \"%s\"", installCmdOptions.Kube.Namespace, err.Error()))
 		}
 
 		_ = questionnaire.AskAboutManifest(&installCmdOptions)
@@ -56,9 +52,10 @@ var installCmd = &cobra.Command{
 
 		logger.Info(fmt.Sprint("Changing service type to \"LoadBalancer\"..."))
 
-		argocdServer, err := kubeClient.GetDeployments("app.kubernetes.io/name=argocd-server")
+		argocdServer, err := kubeClient.GetService("app.kubernetes.io/name=argocd-server")
 		if err == nil {
-			err = kubeClient.UpdateDeployments(argocdServer)
+			argocdServer.Spec.Type = "LoadBalancer"
+			err = kubeClient.UpdateService(argocdServer)
 		}
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
@@ -106,7 +103,7 @@ func init() {
 	flags := installCmd.Flags()
 
 	flags.StringVar(&installCmdOptions.Argo.Password, "set-argo-password", "", "Set password for admin user of new argocd installation")
-	flags.StringVar(&installCmdOptions.Kube.Namespace, "kube-namespace", "", "Namespace in Kubernetes cluster")
+	flags.StringVar(&installCmdOptions.Kube.Namespace, "kube-namespace", "argocd", "Namespace in Kubernetes cluster")
 	flags.StringVar(&installCmdOptions.Kube.ManifestPath, "install-manifest", "", "Url of argocd install manifest")
 
 	var kubeConfigPath string
