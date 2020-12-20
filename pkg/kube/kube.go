@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
+	apixv1beta1client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -24,7 +25,7 @@ import (
 
 type (
 	Kube interface {
-		buildClient() (*kubernetes.Clientset, error)
+		buildClient() (*kubernetes.Clientset, *apixv1beta1client.ApiextensionsV1beta1Client, error)
 
 		CreateNamespace() error
 		NamespaceExists() (bool, error)
@@ -42,6 +43,7 @@ type (
 		namespace        string
 		pathToKubeConfig string
 		clientSet        *kubernetes.Clientset
+		crdClientSet     *apixv1beta1client.ApiextensionsV1beta1Client
 		ctx              context.Context
 	}
 
@@ -59,13 +61,14 @@ func New(o *Options) (Kube, error) {
 		pathToKubeConfig: o.PathToKubeConfig,
 		ctx:              context.Background(),
 	}
-	clientSet, err := client.buildClient()
+	clientSet, crdClientSet, err := client.buildClient()
 
 	if err != nil {
 		return nil, err
 	}
 
 	client.clientSet = clientSet
+	client.crdClientSet = crdClientSet
 
 	return client, nil
 }
@@ -96,7 +99,7 @@ func GetAllContexts(pathToKubeConfig string) ([]string, error) {
 	return result, err
 }
 
-func (k *kube) buildClient() (*kubernetes.Clientset, error) {
+func (k *kube) buildClient() (*kubernetes.Clientset, *apixv1beta1client.ApiextensionsV1beta1Client, error) {
 	var config *rest.Config
 	var err error
 	config, err = clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
@@ -109,9 +112,12 @@ func (k *kube) buildClient() (*kubernetes.Clientset, error) {
 		}).ClientConfig()
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return kubernetes.NewForConfig(config)
+	clientSet, err := kubernetes.NewForConfig(config)
+	apixClient, err := apixv1beta1client.NewForConfig(config)
+
+	return clientSet, apixClient, err
 }
 
 func (k *kube) NamespaceExists() (bool, error) {
@@ -166,7 +172,7 @@ func (k *kube) CreateDeployments(manifestPath string) error {
 	kubeObjectKeys := reflect.ValueOf(kubeObjects).MapKeys()
 
 	for _, key := range kubeObjectKeys {
-		kind, name, createErr := kubeobj.CreateObject(k.clientSet, kubeObjects[key.String()], k.namespace)
+		kind, name, createErr := kubeobj.CreateObject(k.clientSet, k.crdClientSet, kubeObjects[key.String()], k.namespace)
 
 		if createErr == nil {
 			// skip, everything ok
