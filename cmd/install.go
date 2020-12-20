@@ -8,16 +8,37 @@ import (
 	"github.com/codefresh-io/cf-gitops-controller/pkg/kube"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/questionnaire"
+	"github.com/janeczku/go-spinner"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
 	"os/user"
 	"path"
+	"time"
 )
 
 var DEFAULT_USER_NAME = "admin"
 var FAILED = "FAILED"
 var installCmdOptions = install.CmdOptions{}
+
+func retrieveArgoHost(kubeClient kube.Kube) (string, error) {
+	var argoHost string
+	var err error
+	start := time.Now()
+	s := spinner.StartNew("Getting argocd ip address...")
+	for {
+		argoHost, err = kubeClient.GetArgoServerHost()
+		if err == nil {
+			break
+		}
+		time.Sleep(3 * time.Second)
+		if time.Now().Sub(start).Minutes() > 2 {
+			return "", errors.New("Failed to retrieve argocd host")
+		}
+	}
+	s.Stop()
+	return argoHost, nil
+}
 
 var installCmd = &cobra.Command{
 	Use:   "install",
@@ -63,8 +84,7 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
 		}
 
-		logger.Info(fmt.Sprint("Getting argocd ip address..."))
-		argoHost, err := kubeClient.GetArgoServerHost()
+		argoHost, err := retrieveArgoHost(kubeClient)
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
 		}
@@ -113,7 +133,7 @@ func init() {
 	if currentUser != nil {
 		kubeConfigPath = os.Getenv("KUBECONFIG")
 		if kubeConfigPath == "" {
-			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config")
+			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config-cf")
 		}
 	}
 

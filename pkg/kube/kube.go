@@ -241,6 +241,9 @@ func (k *kube) GetArgoServerHost() (string, error) {
 	}
 	svc := svcs.Items[0]
 	ingresses := svc.Status.LoadBalancer.Ingress
+	if len(ingresses) == 0 {
+		return "", errors.New("ingress not exist")
+	}
 
 	ingress := ingresses[0]
 

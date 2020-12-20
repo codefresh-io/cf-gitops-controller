@@ -10,6 +10,7 @@ require (
 	github.com/codefresh-io/argocd-sdk v0.2.0
 	github.com/gookit/color v1.2.7
 	github.com/huandu/xstrings v1.3.2 // indirect
+	github.com/janeczku/go-spinner v0.0.0-20150530144529-cf8ef1d64394
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
