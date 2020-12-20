@@ -33,6 +33,9 @@ func askAboutPass() string {
 	if firstPassword != secondPassword {
 		logger.Error("Passwords are different")
 		return ""
+	} else if firstPassword == "" {
+		logger.Error("Passwords is too short")
+		return ""
 	}
 	return firstPassword
 }
