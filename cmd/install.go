@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	argo "github.com/codefresh-io/argocd-sdk/pkg/api"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/helper"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/kube"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/questionnaire"
+	"github.com/codefresh-io/go-sdk/pkg/codefresh"
 	"github.com/janeczku/go-spinner"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -46,6 +48,16 @@ var installCmd = &cobra.Command{
 	Long:  `Install gitops codefresh`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		logger.Success("This installer will guide you through the Codefresh Gitops controller installation")
+
+		codefreshApi := codefresh.New(&codefresh.ClientOptions{
+			Host: installCmdOptions.Codefresh.Host,
+			Auth: codefresh.AuthOptions{
+				Token: installCmdOptions.Codefresh.Auth.Token,
+			},
+		})
+
+		clustersList, err := codefreshApi.Clusters().GetAccountClusters()
+		clustersList = helper.FilterClusters(clustersList)
 
 		_ = questionnaire.AskAboutKubeContext(&installCmdOptions)
 		kubeOptions := installCmdOptions.Kube
@@ -123,6 +135,9 @@ var installCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(installCmd)
 	flags := installCmd.Flags()
+
+	flags.StringVar(&installCmdOptions.Codefresh.Host, "codefresh-host", "", "Codefresh host")
+	flags.StringVar(&installCmdOptions.Codefresh.Auth.Token, "codefresh-token", "", "Codefresh api token")
 
 	flags.StringVar(&installCmdOptions.Argo.Password, "set-argo-password", "", "Set password for admin user of new argocd installation")
 	flags.StringVar(&installCmdOptions.Kube.Namespace, "kube-namespace", "argocd", "Namespace in Kubernetes cluster")
