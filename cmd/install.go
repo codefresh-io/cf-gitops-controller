@@ -162,7 +162,7 @@ func init() {
 		}
 	}
 
-	flags.StringVar(&installCmdOptions.Kube.ConfigPath, "kube-config-path", kubeConfigPath, "Path to kubeconfig file (default is $HOME/.kube/config)")
+	flags.StringVar(&installCmdOptions.Kube.ConfigPath, "kubeconfig", kubeConfigPath, "Path to kubeconfig file (default is $HOME/.kube/config)")
 	flags.StringVar(&installCmdOptions.Kube.Context, "kube-context-name", viper.GetString("kube-context"), "Name of the kubernetes context on which Argo agent should be installed (default is current-context) [$KUBE_CONTEXT]")
 
 }
