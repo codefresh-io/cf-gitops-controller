@@ -193,7 +193,7 @@ func (k *kube) DeleteObjects(manifestPath string) error {
 	var kind, name string
 	var deleteError error
 	for _, obj := range kubeObjects {
-		kind, name, deleteError = kubeobj.DeleteObject(k.clientSet, obj, k.namespace)
+		kind, name, deleteError = kubeobj.DeleteObject(k.clientSet, k.crdClientSet, obj, k.namespace)
 		if deleteError == nil {
 			fmt.Println(fmt.Sprintf("%s \"%s\" deleted", kind, name))
 		} else if statusError, errIsStatusError := deleteError.(*k8sErrors.StatusError); errIsStatusError {
