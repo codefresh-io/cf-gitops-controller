@@ -55,7 +55,7 @@ var installCmd = &cobra.Command{
 			PathToKubeConfig: kubeOptions.ConfigPath,
 		})
 		if err != nil {
-			return err
+			return failInstallation(fmt.Sprintf("Can't create kube client: \"%s\"", err.Error()))
 		}
 
 		_ = questionnaire.AskAboutNamespace(&installCmdOptions, kubeClient)
@@ -66,7 +66,7 @@ var installCmd = &cobra.Command{
 
 		_ = questionnaire.AskAboutManifest(&installCmdOptions)
 		logger.Info(fmt.Sprint("Creating argocd resources..."))
-		err = kubeClient.CreateDeployments(installCmdOptions.Kube.ManifestPath)
+		err = kubeClient.CreateObjects(installCmdOptions.Kube.ManifestPath)
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't create argocd resources: \"%s\"", err.Error()))
 		}
@@ -115,7 +115,7 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
 		}
 
-		logger.Success(fmt.Sprint("Successfully installed codefresh gitops controller"))
+		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s%", argoHost))
 		return nil
 	},
 }
@@ -133,7 +133,7 @@ func init() {
 	if currentUser != nil {
 		kubeConfigPath = os.Getenv("KUBECONFIG")
 		if kubeConfigPath == "" {
-			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config-cf")
+			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config")
 		}
 	}
 

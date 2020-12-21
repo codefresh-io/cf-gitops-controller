@@ -281,11 +281,25 @@ func CheckObject(clientset *kubernetes.Clientset, obj runtime.Object, namespace 
 }
 
 // DeleteObject - checks kubernetes object from *runtime.Object. Returns object name, kind and creation error
-func DeleteObject(clientset *kubernetes.Clientset, obj runtime.Object, namespace string) (string, string, error) {
+func DeleteObject(clientset *kubernetes.Clientset, apiextensionsClientSet *apixv1beta1client.ApiextensionsV1beta1Client, obj runtime.Object, namespace string) (string, string, error) {
 	var propagationPolicy metav1.DeletionPropagation = "Background"
 	var name, kind string
 	var err error
 	switch objT := obj.(type) {
+
+	case *apiextensionv1beta1.CustomResourceDefinition:
+		name = objT.ObjectMeta.Name
+		kind = objT.TypeMeta.Kind
+		err = apiextensionsClientSet.CustomResourceDefinitions().Delete(name, &metav1.DeleteOptions{
+			PropagationPolicy: &propagationPolicy,
+		})
+
+	case *v1api.StatefulSet:
+		name = objT.ObjectMeta.Name
+		kind = objT.TypeMeta.Kind
+		err = clientset.AppsV1().StatefulSets(namespace).Delete(name, &metav1.DeleteOptions{
+			PropagationPolicy: &propagationPolicy,
+		})
 
 	case *appsv1.DaemonSet:
 		name = objT.ObjectMeta.Name
