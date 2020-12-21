@@ -1,6 +1,14 @@
 package install
 
 type CmdOptions struct {
+	Codefresh struct {
+		Host string
+		Auth struct {
+			Token string
+		}
+		Clusters []string
+	}
+
 	Kube struct {
 		ManifestPath string
 		Namespace    string
