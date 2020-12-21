@@ -160,7 +160,7 @@ func init() {
 	if currentUser != nil {
 		kubeConfigPath = os.Getenv("KUBECONFIG")
 		if kubeConfigPath == "" {
-			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config-cf")
+			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config")
 		}
 	}
 
