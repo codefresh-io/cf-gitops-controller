@@ -144,6 +144,17 @@ var installCmd = &cobra.Command{
 		}
 		_ = questionnaire.AskAboutGitContext(&installCmdOptions, contexts)
 		_ = questionnaire.AskAboutGitRepo(&installCmdOptions)
+		if installCmdOptions.Git.RepoUrl != "" {
+			err = argoApi.Repository().CreateRepository(argo.CreateRepositoryOpt{
+				Repo:     installCmdOptions.Git.RepoUrl,
+				Username: installCmdOptions.Git.Auth.Pass,
+				Password: installCmdOptions.Git.Auth.Pass,
+			})
+			if err != nil {
+				// @todo - retry url passing
+				return failInstallation(fmt.Sprintf("Can't manage access to git repo: \"%s\"", err.Error()))
+			}
+		}
 
 		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s%", argoHost))
 		return nil

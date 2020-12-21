@@ -10,7 +10,7 @@ func AskAboutGitRepo(installOptions *install.CmdOptions) error {
 	if installOptions.Git.Integration == "" || installOptions.Git.Auth.Pass == "" {
 		return nil
 	}
-	_ = prompt.Input(&installOptions.Git.RepoUrl, "Enter repo url")
+	_ = prompt.Input(&installOptions.Git.RepoUrl, "Enter git repo url")
 	return nil
 }
 

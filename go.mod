@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/codefresh-io/argocd-sdk v0.2.2
+	github.com/codefresh-io/argocd-sdk v0.2.4
 	github.com/codefresh-io/go-sdk v0.19.5
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gookit/color v1.2.7
