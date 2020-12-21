@@ -1,6 +1,15 @@
 package install
 
 type CmdOptions struct {
+	Git struct {
+		Auth struct {
+			Type string
+			Pass string
+		}
+		Integration string
+		RepoUrl     string
+	}
+
 	Codefresh struct {
 		Host string
 		Auth struct {
