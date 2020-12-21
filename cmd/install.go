@@ -5,6 +5,7 @@ import (
 	"fmt"
 	argo "github.com/codefresh-io/argocd-sdk/pkg/api"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/clusters"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/git"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/kube"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
@@ -136,6 +137,13 @@ var installCmd = &cobra.Command{
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
 		}
+
+		contexts, err := git.GetAvailableContexts(codefreshApi.Contexts())
+		if err != nil {
+			return failInstallation(fmt.Sprintf("Can't get git contexts: \"%s\"", err.Error()))
+		}
+		_ = questionnaire.AskAboutGitContext(&installCmdOptions, contexts)
+		_ = questionnaire.AskAboutGitRepo(&installCmdOptions)
 
 		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s%", argoHost))
 		return nil
