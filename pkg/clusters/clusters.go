@@ -8,7 +8,7 @@ import (
 	"github.com/codefresh-io/go-sdk/pkg/codefresh"
 )
 
-func FilterClusters(clusters []*codefresh.ClusterMinified) []*codefresh.ClusterMinified {
+func filterClusters(clusters []*codefresh.ClusterMinified) []*codefresh.ClusterMinified {
 	filteredClusters := []*codefresh.ClusterMinified{}
 	for _, cluster := range clusters {
 		if cluster.Provider == "local" {
@@ -16,6 +16,14 @@ func FilterClusters(clusters []*codefresh.ClusterMinified) []*codefresh.ClusterM
 		}
 	}
 	return filteredClusters
+}
+
+func GetAvailableClusters(cfClustersApi codefresh.IClusterAPI) ([]*codefresh.ClusterMinified, error) {
+	clustersList, err := cfClustersApi.GetAccountClusters()
+	if err != nil {
+		return []*codefresh.ClusterMinified{}, err
+	}
+	return filterClusters(clustersList), nil
 }
 
 func ImportFromCodefresh(clusters []string, cfClustersApi codefresh.IClusterAPI, argoClustersApi argo.ClusterApi) error {

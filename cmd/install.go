@@ -76,12 +76,10 @@ var installCmd = &cobra.Command{
 		_ = questionnaire.AskAboutManifest(&installCmdOptions)
 
 		logger.Info(fmt.Sprint("Getting argocd clusters..."))
-		clustersList, err := codefreshApi.Clusters().GetAccountClusters()
+		clustersList, err := clusters.GetAvailableClusters(codefreshApi.Clusters())
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't get argocd clusters: \"%s\"", err.Error()))
 		}
-
-		clustersList = clusters.FilterClusters(clustersList)
 
 		_ = questionnaire.AskAboutClusters(&installCmdOptions, clustersList)
 		_ = questionnaire.AskAboutPass(&installCmdOptions)
