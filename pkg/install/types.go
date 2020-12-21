@@ -6,6 +6,7 @@ type CmdOptions struct {
 		Auth struct {
 			Token string
 		}
+		Clusters []string
 	}
 
 	Kube struct {
