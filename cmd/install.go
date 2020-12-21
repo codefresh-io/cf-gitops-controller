@@ -133,9 +133,10 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
 		}
 
+		logger.Info(fmt.Sprint("Import clusters..."))
 		err = clusters.ImportFromCodefresh(installCmdOptions.Codefresh.Clusters, codefreshApi.Clusters(), argoApi.Clusters())
 		if err != nil {
-			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
+			return failInstallation(fmt.Sprintf("Can't import clusters: \"%s\"", err.Error()))
 		}
 
 		contexts, err := git.GetAvailableContexts(codefreshApi.Contexts())
@@ -145,6 +146,7 @@ var installCmd = &cobra.Command{
 		_ = questionnaire.AskAboutGitContext(&installCmdOptions, contexts)
 		_ = questionnaire.AskAboutGitRepo(&installCmdOptions)
 		if installCmdOptions.Git.RepoUrl != "" {
+			logger.Info(fmt.Sprint("Creating repositories..."))
 			err = argoApi.Repository().CreateRepository(argo.CreateRepositoryOpt{
 				Repo:     installCmdOptions.Git.RepoUrl,
 				Username: installCmdOptions.Git.Auth.Pass,
