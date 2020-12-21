@@ -13,7 +13,7 @@ const CODEFRESH_CLUSTER_PREFIX = "cf-"
 func filterClusters(clusters []*codefresh.ClusterMinified) []*codefresh.ClusterMinified {
 	filteredClusters := []*codefresh.ClusterMinified{}
 	for _, cluster := range clusters {
-		if cluster.Provider == "local" {
+		if cluster.Provider == "local" && cluster.BehindFirewall == false {
 			filteredClusters = append(filteredClusters, cluster)
 		}
 	}
