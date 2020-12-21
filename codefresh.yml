@@ -35,7 +35,7 @@ steps:
             - success
       branch:
         only:
-          - master
+          - main
 
   create_git_tag:
     title: Push tag to git
@@ -56,7 +56,7 @@ steps:
         - name: main_clone
       branch:
         only:
-          - master
+          - main
 
   release_binaries:
     title: Create release in Github with argo-agent CLI
@@ -73,4 +73,4 @@ steps:
             - finished
       branch:
         only:
-          - master
+          - main
