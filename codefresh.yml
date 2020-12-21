@@ -25,7 +25,7 @@ steps:
     stage: build
     image: codefresh/semver
     commands:
-      - export CF_GITOPS_VERSION=$(cat ./installer/VERSION)
+      - export CF_GITOPS_VERSION=$(cat ./VERSION)
       - echo "Cf gitops version -> CF_GITOPS_VERSION "
       - cf_export VERSION=$CF_GITOPS_VERSION
     when:
