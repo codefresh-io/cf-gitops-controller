@@ -115,7 +115,7 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
 		}
 
-		logger.Success(fmt.Sprint("Successfully installed codefresh gitops controller"))
+		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s%", argoHost))
 		return nil
 	},
 }
