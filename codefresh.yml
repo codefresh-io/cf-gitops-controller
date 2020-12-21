@@ -64,7 +64,6 @@ steps:
     stage: Release
     fail_fast: false
     commands:
-      - cd installer
       - goreleaser release -f .goreleaser.yml --rm-dist --skip-validate # pre-release
     when:
       steps:
