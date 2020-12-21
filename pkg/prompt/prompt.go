@@ -33,7 +33,7 @@ func InputPassword(target *string, label string) error {
 	}
 
 	prompt := &survey.Password{
-		Message: label + "\n",
+		Message: label,
 	}
 
 	err := survey.AskOne(prompt, target)
