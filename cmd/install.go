@@ -49,6 +49,8 @@ var installCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		logger.Success("This installer will guide you through the Codefresh Gitops controller installation")
 
+		_ = questionnaire.AskAboutCodefreshCredentials(&installCmdOptions)
+
 		codefreshApi := codefresh.New(&codefresh.ClientOptions{
 			Host: installCmdOptions.Codefresh.Host,
 			Auth: codefresh.AuthOptions{
@@ -158,7 +160,7 @@ func init() {
 	if currentUser != nil {
 		kubeConfigPath = os.Getenv("KUBECONFIG")
 		if kubeConfigPath == "" {
-			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config")
+			kubeConfigPath = path.Join(currentUser.HomeDir, ".kube", "config-cf")
 		}
 	}
 
