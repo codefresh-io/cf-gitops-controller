@@ -132,7 +132,10 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
 		}
 
-		_ = clusters.ImportFromCodefresh(installCmdOptions.Codefresh.Clusters, codefreshApi.Clusters(), argoApi.Clusters())
+		err = clusters.ImportFromCodefresh(installCmdOptions.Codefresh.Clusters, codefreshApi.Clusters(), argoApi.Clusters())
+		if err != nil {
+			return failInstallation(fmt.Sprintf("Can't update user pass: \"%s\"", err.Error()))
+		}
 
 		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s%", argoHost))
 		return nil

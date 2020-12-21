@@ -8,6 +8,8 @@ import (
 	"github.com/codefresh-io/go-sdk/pkg/codefresh"
 )
 
+const CODEFRESH_CLUSTER_PREFIX = "cf-"
+
 func filterClusters(clusters []*codefresh.ClusterMinified) []*codefresh.ClusterMinified {
 	filteredClusters := []*codefresh.ClusterMinified{}
 	for _, cluster := range clusters {
@@ -27,6 +29,9 @@ func GetAvailableClusters(cfClustersApi codefresh.IClusterAPI) ([]*codefresh.Clu
 }
 
 func ImportFromCodefresh(clusters []string, cfClustersApi codefresh.IClusterAPI, argoClustersApi argo.ClusterApi) error {
+	if len(clusters) < 1 {
+		return nil
+	}
 	for _, clusterSelector := range clusters {
 		cluster, err := cfClustersApi.GetClusterCredentialsByAccountId(clusterSelector)
 		if err != nil {
@@ -39,7 +44,7 @@ func ImportFromCodefresh(clusters []string, cfClustersApi codefresh.IClusterAPI,
 		}
 
 		_, err = argoClustersApi.CreateCluster(argo.ClusterOpt{
-			Name:   clusterSelector,
+			Name:   CODEFRESH_CLUSTER_PREFIX + clusterSelector,
 			Server: cluster.Url,
 			Config: argo.ClusterConfig{
 				BearerToken: string(bearer),
