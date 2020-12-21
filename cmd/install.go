@@ -172,7 +172,7 @@ var installCmd = &cobra.Command{
 			}
 		}
 
-		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s%", argoHost))
+		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s", argoHost))
 		return nil
 	},
 }
