@@ -183,8 +183,10 @@ func init() {
 
 	flags.StringVar(&installCmdOptions.Codefresh.Host, "codefresh-host", "", "Codefresh host")
 	flags.StringVar(&installCmdOptions.Codefresh.Auth.Token, "codefresh-token", "", "Codefresh api token")
+	flags.StringArrayVar(&installCmdOptions.Codefresh.Clusters, "codefresh-clusters", make([]string, 0), "")
 
 	flags.StringVar(&installCmdOptions.Argo.Password, "set-argo-password", "", "Set password for admin user of new argocd installation")
+
 	flags.StringVar(&installCmdOptions.Kube.Namespace, "kube-namespace", "argocd", "Namespace in Kubernetes cluster")
 	flags.StringVar(&installCmdOptions.Kube.ManifestPath, "install-manifest", "", "Url of argocd install manifest")
 
@@ -199,6 +201,9 @@ func init() {
 
 	flags.StringVar(&installCmdOptions.Kube.ConfigPath, "kubeconfig", kubeConfigPath, "Path to kubeconfig file (default is $HOME/.kube/config)")
 	flags.StringVar(&installCmdOptions.Kube.Context, "kube-context-name", viper.GetString("kube-context"), "Name of the kubernetes context on which Argo agent should be installed (default is current-context) [$KUBE_CONTEXT]")
+
+	flags.StringVar(&installCmdOptions.Git.Integration, "git-integration", "", "Name of git integration in Codefresh")
+	flags.StringVar(&installCmdOptions.Git.RepoUrl, "git-repo-url", "", "Url to git manifest repo")
 
 }
 
