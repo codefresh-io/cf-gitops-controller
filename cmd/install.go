@@ -157,7 +157,7 @@ var installCmd = &cobra.Command{
 			}
 		}
 
-		_, addManifestRepo := prompt.Confirm("Add clusters from codefresh to argocd server")
+		_, addManifestRepo := prompt.Confirm("Add git context for manifest repo from codefresh to argocd server")
 		if addManifestRepo {
 			// git repo
 			contexts, err := git.GetAvailableContexts(codefreshApi.Contexts())
