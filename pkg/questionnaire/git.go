@@ -1,7 +1,9 @@
 package questionnaire
 
 import (
+	"fmt"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/prompt"
 	"github.com/codefresh-io/go-sdk/pkg/codefresh"
 )
@@ -33,6 +35,8 @@ func AskAboutGitContext(installOptions *install.CmdOptions, contexts *[]codefres
 	} else {
 		_, installOptions.Git.Integration = prompt.Select(list, "Select Git context")
 	}
+
+	logger.Info(fmt.Sprintf("Use \"%s\" git integration for integrate with manifest repo", installOptions.Git.Integration))
 
 	installOptions.Git.Auth.Type = types[installOptions.Git.Integration]
 	installOptions.Git.Auth.Pass = passwords[installOptions.Git.Integration]

@@ -30,8 +30,10 @@ func GetAvailableClusters(cfClustersApi codefresh.IClusterAPI) ([]*codefresh.Clu
 
 func ImportFromCodefresh(clusters []string, cfClustersApi codefresh.IClusterAPI, argoClustersApi argo.ClusterApi) error {
 	if len(clusters) < 1 {
+		logger.Warning(fmt.Sprint("Import clusters skipped because nothing was selected..."))
 		return nil
 	}
+	logger.Info(fmt.Sprint("Import clusters..."))
 	for _, clusterSelector := range clusters {
 		cluster, err := cfClustersApi.GetClusterCredentialsByAccountId(clusterSelector)
 		if err != nil {

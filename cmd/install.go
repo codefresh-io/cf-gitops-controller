@@ -91,7 +91,6 @@ var installCmd = &cobra.Command{
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't get argocd server: \"%s\"", err.Error()))
 		}
-		logger.Info(fmt.Sprint("Changing service type to \"LoadBalancer\"..."))
 		argocdServer.Spec.Type = "LoadBalancer"
 		err = kubeClient.UpdateService(argocdServer)
 		if err != nil {
@@ -148,7 +147,6 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't get argocd clusters: \"%s\"", err.Error()))
 		}
 		_ = questionnaire.AskAboutClusters(&installCmdOptions, clustersList)
-		logger.Info(fmt.Sprint("Import clusters..."))
 		err = clusters.ImportFromCodefresh(installCmdOptions.Codefresh.Clusters, codefreshApi.Clusters(), argoApi.Clusters())
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't import clusters: \"%s\"", err.Error()))
