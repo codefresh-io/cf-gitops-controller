@@ -185,7 +185,7 @@ func init() {
 	flags.StringVar(&installCmdOptions.Codefresh.Auth.Token, "codefresh-token", "", "Codefresh api token")
 	flags.StringArrayVar(&installCmdOptions.Codefresh.Clusters, "codefresh-clusters", make([]string, 0), "")
 
-	flags.StringVar(&installCmdOptions.Argo.Password, "set-argo-password", "", "Set password for admin user of new argocd installation")
+	flags.StringVar(&installCmdOptions.Argo.Password, "argo-password", "", "Set password for admin user of new argocd installation")
 
 	flags.StringVar(&installCmdOptions.Kube.Namespace, "kube-namespace", "argocd", "Namespace in Kubernetes cluster")
 	flags.StringVar(&installCmdOptions.Kube.ManifestPath, "install-manifest", "", "Url of argocd install manifest")
