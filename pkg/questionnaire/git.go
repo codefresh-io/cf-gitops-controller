@@ -2,9 +2,9 @@ package questionnaire
 
 import (
 	"fmt"
+	"github.com/codefresh-io/argocd-listener/installer/pkg/logger"
+	"github.com/codefresh-io/argocd-listener/installer/pkg/prompt"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
-	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
-	"github.com/codefresh-io/cf-gitops-controller/pkg/prompt"
 	"github.com/codefresh-io/go-sdk/pkg/codefresh"
 )
 
@@ -12,7 +12,11 @@ func AskAboutGitRepo(installOptions *install.CmdOptions) error {
 	if installOptions.Git.Integration == "" || installOptions.Git.Auth.Pass == "" {
 		return nil
 	}
-	_ = prompt.Input(&installOptions.Git.RepoUrl, "Enter git repo url")
+	_, gitRepoIntegration := prompt.Confirm("Enable git-repo integration?")
+
+	if gitRepoIntegration {
+		_ = prompt.Input(&installOptions.Git.RepoUrl, "Enter git repo url")
+	}
 	return nil
 }
 

@@ -3,9 +3,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/codefresh-io/argocd-listener/installer/pkg/kube"
+	"github.com/codefresh-io/argocd-listener/installer/pkg/logger"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
-	"github.com/codefresh-io/cf-gitops-controller/pkg/kube"
-	"github.com/codefresh-io/cf-gitops-controller/pkg/logger"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/questionnaire"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
