@@ -1,8 +1,8 @@
 package questionnaire
 
 import (
+	"github.com/codefresh-io/argocd-listener/installer/pkg/prompt"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
-	"github.com/codefresh-io/cf-gitops-controller/pkg/prompt"
 )
 
 func AskAboutPass(installOptions *install.CmdOptions) error {
