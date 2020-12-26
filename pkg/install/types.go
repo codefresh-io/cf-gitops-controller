@@ -25,6 +25,9 @@ type CmdOptions struct {
 		ConfigPath   string
 	}
 	Argo struct {
+		Token    string
+		Host     string
 		Password string
+		Username string
 	}
 }
