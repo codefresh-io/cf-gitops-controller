@@ -12,7 +12,7 @@ func AskAboutGitRepo(installOptions *install.CmdOptions) error {
 	if installOptions.Git.Integration == "" || installOptions.Git.Auth.Pass == "" {
 		return nil
 	}
-	_ = prompt.Input(&installOptions.Git.RepoUrl, "Enter manifest repo url , for example: https://github.com/argoproj/argocd-example-apps")
+	_ = prompt.InputWithDefault(&installOptions.Git.RepoUrl, "Please specify url to your manifest repository to add to ArgoCD", "https://github.com/argoproj/argocd-example-apps")
 	return nil
 }
 

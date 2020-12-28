@@ -89,15 +89,18 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't create argocd resources: \"%s\"", err.Error()))
 		}
 
-		// load balancer
-		argocdServer, err := kubeClient.GetService("app.kubernetes.io/name=argocd-server")
-		if err != nil {
-			return failInstallation(fmt.Sprintf("Can't get argocd server: \"%s\"", err.Error()))
-		}
-		argocdServer.Spec.Type = "LoadBalancer"
-		err = kubeClient.UpdateService(argocdServer)
-		if err != nil {
-			return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
+		_, loadBalancer := prompt.Confirm("Would you like to expose ArgoCD with LoadBalancer? ( This is required when using Codefresh steps )")
+		if loadBalancer {
+			// load balancer
+			argocdServer, err := kubeClient.GetService("app.kubernetes.io/name=argocd-server")
+			if err != nil {
+				return failInstallation(fmt.Sprintf("Can't get argocd server: \"%s\"", err.Error()))
+			}
+			argocdServer.Spec.Type = "LoadBalancer"
+			err = kubeClient.UpdateService(argocdServer)
+			if err != nil {
+				return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
+			}
 		}
 
 		//argo ghost
@@ -145,7 +148,7 @@ var installCmd = &cobra.Command{
 		argoClientOptions = argo.ClientOptions{Auth: argo.AuthOptions{Token: token}, Host: argoHost}
 		argoApi = argo.New(&argoClientOptions)
 
-		_, addClusters := prompt.Confirm("Add clusters from codefresh to argocd server")
+		_, addClusters := prompt.Confirm("Would you like to integrate clusters from your account to ArgoCD?")
 
 		if addClusters {
 			//clusters
@@ -161,7 +164,7 @@ var installCmd = &cobra.Command{
 			}
 		}
 
-		_, addManifestRepo := prompt.Confirm("Add git context for manifest repo from codefresh to argocd server")
+		_, addManifestRepo := prompt.Confirm("Would you like to integrate git context for manifest repo from your account to ArgoCD?")
 		if addManifestRepo {
 			// git repo
 			contexts, err := git.GetAvailableContexts(codefreshApi.Contexts())
@@ -184,6 +187,7 @@ var installCmd = &cobra.Command{
 			}
 
 		}
+
 		logger.Info(fmt.Sprint("Install agent..."))
 		err = agentInstaller.Run(initAgentInstallOptions(&installCmdOptions))
 		if err != nil {
@@ -215,13 +219,9 @@ func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstall
 
 	agentInstallOptions.Kube.ConfigPath = installCmdOptions.Kube.ConfigPath
 
-	//flags.StringVar(&installCmdOptions.Codefresh.Integration, "codefresh-integration", "", "Argocd integration in Codefresh")
-	//flags.BoolVar(&installCmdOptions.Argo.Update, "update", false, "Update integration if exists")
-	//flags.StringVar(&installCmdOptions.Host.HttpProxy, "http-proxy", "", "Http proxy")
-	//flags.StringVar(&installCmdOptions.Host.HttpsProxy, "https-proxy", "", "Https proxy")
-	//flags.BoolVar(&installCmdOptions.Kube.InCluster, "in-cluster", false, "Set flag if Argo agent is been installed from inside a cluster")
-	//flags.StringVar(&installCmdOptions.Codefresh.SyncMode, "sync-mode", "", "")
-	//flags.StringArrayVar(&installCmdOptions.Codefresh.ApplicationsForSyncArr, "sync-apps", make([]string, 0), "")
+	agentInstallOptions.Codefresh.SyncMode = "CONTINUE_SYNC"
+	agentInstallOptions.Codefresh.Integration = "cf-gitops-controller"
+
 	return agentInstallOptions
 }
 

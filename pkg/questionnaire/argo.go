@@ -12,6 +12,6 @@ func AskAboutPass(installOptions *install.CmdOptions) error {
 
 func askAboutPass() string {
 	var firstPassword string
-	_ = prompt.InputPassword(&firstPassword, "New argocd password")
+	_ = prompt.InputPassword(&firstPassword, "Please specify root password for ArgoCD")
 	return firstPassword
 }
