@@ -30,4 +30,8 @@ type CmdOptions struct {
 		Password string
 		Username string
 	}
+
+	Controller struct {
+		LoadBalancer bool
+	}
 }

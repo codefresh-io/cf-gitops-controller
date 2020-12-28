@@ -89,19 +89,7 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't create argocd resources: \"%s\"", err.Error()))
 		}
 
-		_, loadBalancer := prompt.Confirm("Would you like to expose ArgoCD with LoadBalancer? ( This is required when using Codefresh steps )")
-		if loadBalancer {
-			// load balancer
-			argocdServer, err := kubeClient.GetService("app.kubernetes.io/name=argocd-server")
-			if err != nil {
-				return failInstallation(fmt.Sprintf("Can't get argocd server: \"%s\"", err.Error()))
-			}
-			argocdServer.Spec.Type = "LoadBalancer"
-			err = kubeClient.UpdateService(argocdServer)
-			if err != nil {
-				return failInstallation(fmt.Sprintf("Can't change service type to LoadBalancer: \"%s\"", err.Error()))
-			}
-		}
+		_ = questionnaire.AskAboutLoadBalancer(&installCmdOptions, kubeClient)
 
 		//argo ghost
 		argoHost, err := retrieveArgoHost(kubeClient)
@@ -255,6 +243,8 @@ func init() {
 
 	flags.StringVar(&installCmdOptions.Git.Integration, "git-integration", "", "Name of git integration in Codefresh")
 	flags.StringVar(&installCmdOptions.Git.RepoUrl, "git-repo-url", "", "Url to git manifest repo")
+
+	flags.BoolVar(&installCmdOptions.Controller.LoadBalancer, "load-balancer", true, "Setup load balancer")
 
 }
 
