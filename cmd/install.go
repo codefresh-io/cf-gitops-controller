@@ -177,7 +177,7 @@ var installCmd = &cobra.Command{
 		}
 
 		logger.Info(fmt.Sprint("Install agent..."))
-		err = agentInstaller.Run(initAgentInstallOptions(&installCmdOptions))
+		err, _ = agentInstaller.Run(initAgentInstallOptions(&installCmdOptions))
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't get git contexts: \"%s\"", err.Error()))
 		}
