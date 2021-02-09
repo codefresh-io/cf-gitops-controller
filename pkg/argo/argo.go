@@ -1,9 +1,11 @@
-package applications
+package argo
 
-import argo "github.com/codefresh-io/argocd-sdk/pkg/api"
+import (
+	argoSdk "github.com/codefresh-io/argocd-sdk/pkg/api"
+)
 
-func CreateDefault(argoApi *argo.Argo) error {
-	var requestOptions argo.CreateApplicationOpt
+func CreateDefaultApp(argoApi *argoSdk.Argo) error {
+	var requestOptions argoSdk.CreateApplicationOpt
 	requestOptions.Metadata.Name = "default"
 	requestOptions.Spec.Project = "default"
 	requestOptions.Spec.Destination.Name = ""
