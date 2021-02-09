@@ -9,6 +9,7 @@ import (
 	"github.com/codefresh-io/argocd-listener/installer/pkg/logger"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/prompt"
 	argo "github.com/codefresh-io/argocd-sdk/pkg/api"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/applications"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/clusters"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/git"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
@@ -177,7 +178,7 @@ var installCmd = &cobra.Command{
 		}
 
 		logger.Info(fmt.Sprint("Create default argocd app..."))
-		err = createDefaultApp(&argoApi)
+		err = applications.CreateDefault(&argoApi)
 		if err != nil {
 			return failInstallation(fmt.Sprintf("Can't install argocd agent: \"%s\"", err.Error()))
 		}
@@ -191,19 +192,6 @@ var installCmd = &cobra.Command{
 		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s", argoHost))
 		return nil
 	},
-}
-
-func createDefaultApp(argoApi *argo.Argo) error {
-	var requestOptions argo.CreateApplicationOpt
-	requestOptions.Metadata.Name = "default"
-	requestOptions.Spec.Project = "default"
-	requestOptions.Spec.Destination.Name = ""
-	requestOptions.Spec.Destination.Namespace = ""
-	requestOptions.Spec.Destination.Server = "https://kubernetes.default.svc"
-	requestOptions.Spec.Source.RepoURL = "https://github.com/argoproj/argocd-example-apps.git"
-	requestOptions.Spec.Source.Path = "guestbook"
-	requestOptions.Spec.Source.TargetRevision = "HEAD"
-	return (*argoApi).Application().CreateApplication(requestOptions)
 }
 
 func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstallPkg.InstallCmdOptions {
