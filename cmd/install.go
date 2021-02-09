@@ -180,7 +180,7 @@ var installCmd = &cobra.Command{
 		logger.Info(fmt.Sprint("Create default argocd app..."))
 		err = applications.CreateDefault(&argoApi)
 		if err != nil {
-			return failInstallation(fmt.Sprintf("Can't install argocd agent: \"%s\"", err.Error()))
+			return failInstallation(fmt.Sprintf("Can't create default app: \"%s\"", err.Error()))
 		}
 
 		logger.Info(fmt.Sprint("Install agent..."))
