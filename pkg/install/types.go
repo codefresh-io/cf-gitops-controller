@@ -23,6 +23,7 @@ type CmdOptions struct {
 		Namespace    string
 		Context      string
 		ConfigPath   string
+		InCluster    bool
 	}
 	Argo struct {
 		Token    string

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/kube"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/logger"
+	agentUninstallPkg "github.com/codefresh-io/argocd-listener/installer/pkg/uninstall"
+	agentUninstaller "github.com/codefresh-io/argocd-listener/installer/pkg/uninstall/handler"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/questionnaire"
 	"github.com/spf13/cobra"
@@ -35,12 +37,19 @@ var uninstallCmd = &cobra.Command{
 		}
 
 		_ = questionnaire.AskAboutNamespace(&uninstallCmdOptions, kubeClient)
+		_ = kubeClient.CreateNamespace(uninstallCmdOptions.Kube.Namespace)
+
 		_ = questionnaire.AskAboutManifest(&uninstallCmdOptions)
 		err = kubeClient.DeleteObjects(uninstallCmdOptions.Kube.ManifestPath)
 		if err != nil {
 			return failUninstall(fmt.Sprintf("Can't delete kube objects: \"%s\"", err.Error()))
 		}
 
+		uninstallHandler := agentUninstaller.New(initAgentUninstallOptions(&uninstallCmdOptions))
+		err = uninstallHandler.Run()
+		if err != nil {
+			return failUninstall(fmt.Sprintf("Can't uninstall argocd agent: \"%s\"", err.Error()))
+		}
 		//sendArgoAgentUninstalledEvent(SUCCESS, "")
 
 		logger.Success(fmt.Sprintf("Codefresh gitops controller uninstallation finished successfully"))
@@ -49,12 +58,23 @@ var uninstallCmd = &cobra.Command{
 	},
 }
 
+func initAgentUninstallOptions(uninstallCmdOptions *install.CmdOptions) agentUninstallPkg.CmdOptions {
+	var agentUninstallOptions agentUninstallPkg.CmdOptions
+	agentUninstallOptions.Kube.Namespace = uninstallCmdOptions.Kube.Namespace
+	agentUninstallOptions.Kube.Context = uninstallCmdOptions.Kube.Context
+	agentUninstallOptions.Kube.InCluster = uninstallCmdOptions.Kube.InCluster
+	agentUninstallOptions.Kube.ConfigPath = uninstallCmdOptions.Kube.ConfigPath
+	return agentUninstallOptions
+}
+
 func init() {
 	rootCmd.AddCommand(uninstallCmd)
 	flags := uninstallCmd.Flags()
 
-	flags.StringVar(&uninstallCmdOptions.Kube.Namespace, "kube-namespace", "argocd", "Namespace in Kubernetes cluster")
+	flags.StringVar(&uninstallCmdOptions.Kube.Namespace, "kube-namespace", viper.GetString("kube-namespace"), "Namespace in Kubernetes cluster")
 	flags.StringVar(&uninstallCmdOptions.Kube.ManifestPath, "install-manifest", "", "Url of argocd install manifest")
+
+	flags.BoolVar(&uninstallCmdOptions.Kube.InCluster, "in-cluster", false, "Set flag if venona is been installed from inside a cluster")
 
 	var kubeConfigPath string
 	currentUser, _ := user.Current()
