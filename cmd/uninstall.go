@@ -37,6 +37,8 @@ var uninstallCmd = &cobra.Command{
 		}
 
 		_ = questionnaire.AskAboutNamespace(&uninstallCmdOptions, kubeClient)
+		_ = kubeClient.CreateNamespace(uninstallCmdOptions.Kube.Namespace)
+
 		_ = questionnaire.AskAboutManifest(&uninstallCmdOptions)
 		err = kubeClient.DeleteObjects(uninstallCmdOptions.Kube.ManifestPath)
 		if err != nil {
