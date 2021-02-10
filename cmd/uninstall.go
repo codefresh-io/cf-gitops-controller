@@ -74,7 +74,7 @@ func init() {
 	flags.StringVar(&uninstallCmdOptions.Kube.Namespace, "kube-namespace", viper.GetString("kube-namespace"), "Namespace in Kubernetes cluster")
 	flags.StringVar(&uninstallCmdOptions.Kube.ManifestPath, "install-manifest", "", "Url of argocd install manifest")
 
-	flags.BoolVar(&uninstallCmdOptions.Kube.InCluster, "in-cluster", false, "Set flag if venona is been installed from inside a cluster")
+	flags.BoolVar(&uninstallCmdOptions.Kube.InCluster, "in-cluster", false, "Set flag if argocd is been installed from inside a cluster")
 
 	var kubeConfigPath string
 	currentUser, _ := user.Current()
@@ -86,7 +86,7 @@ func init() {
 	}
 
 	flags.StringVar(&uninstallCmdOptions.Kube.Context, "kube-context-name", viper.GetString("kube-context"), "Name of the kubernetes context on which Argo agent should be installed (default is current-context) [$KUBE_CONTEXT]")
-	flags.StringVar(&uninstallCmdOptions.Kube.ConfigPath, "kube-config-path", kubeConfigPath, "Path to kubeconfig file (default is $HOME/.kube/config)")
+	flags.StringVar(&uninstallCmdOptions.Kube.ConfigPath, "kubeconfig", kubeConfigPath, "Path to kubeconfig file (default is $HOME/.kube/config)")
 }
 
 func failUninstall(msg string) error {
