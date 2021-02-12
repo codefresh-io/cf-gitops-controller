@@ -11,8 +11,9 @@ type CmdOptions struct {
 	}
 
 	Codefresh struct {
-		Host string
-		Auth struct {
+		Host   string
+		Suffix string
+		Auth   struct {
 			Token string
 		}
 		Clusters []string
