@@ -209,6 +209,7 @@ func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstall
 
 	agentInstallOptions.Kube.Namespace = installCmdOptions.Kube.Namespace
 	agentInstallOptions.Kube.Context = installCmdOptions.Kube.Context
+	agentInstallOptions.Kube.InCluster = installCmdOptions.Kube.InCluster
 
 	agentInstallOptions.Git.Integration = installCmdOptions.Git.Integration
 
@@ -235,6 +236,7 @@ func init() {
 
 	flags.StringVar(&installCmdOptions.Kube.Namespace, "kube-namespace", "argocd", "Namespace in Kubernetes cluster")
 	flags.StringVar(&installCmdOptions.Kube.ManifestPath, "install-manifest", "", "Url of argocd install manifest")
+	flags.BoolVar(&installCmdOptions.Kube.InCluster, "in-cluster", false, "Set flag if Gitops controller is been installed from inside a cluster")
 
 	var kubeConfigPath string
 	currentUser, _ := user.Current()
