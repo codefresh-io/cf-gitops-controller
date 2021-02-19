@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	cfEventSender "github.com/codefresh-io/argocd-listener/installer/pkg/cf_event_sender"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/kube"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/logger"
 	agentUninstallPkg "github.com/codefresh-io/argocd-listener/installer/pkg/uninstall"
@@ -50,10 +51,10 @@ var uninstallCmd = &cobra.Command{
 		if err != nil {
 			return failUninstall(fmt.Sprintf("Can't uninstall argocd agent: \"%s\"", err.Error()))
 		}
-		//sendArgoAgentUninstalledEvent(SUCCESS, "")
-
-		logger.Success(fmt.Sprintf("Codefresh gitops controller uninstallation finished successfully"))
-
+		successMsg := fmt.Sprintf("Codefresh gitops controller uninstallation finished successfully")
+		logger.Success(successMsg)
+		eventSender := cfEventSender.New(cfEventSender.EVENT_CONTROLLER_UNINSTALL)
+		eventSender.Success(successMsg)
 		return nil
 	},
 }
@@ -90,6 +91,7 @@ func init() {
 }
 
 func failUninstall(msg string) error {
-	sendControllerInstalledEvent(FAILED, msg)
+	eventSender := cfEventSender.New(cfEventSender.EVENT_CONTROLLER_UNINSTALL)
+	eventSender.Fail(msg)
 	return errors.New(msg)
 }
