@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	cfEventSender "github.com/codefresh-io/argocd-listener/installer/pkg/cf_event_sender"
 	agentInstallPkg "github.com/codefresh-io/argocd-listener/installer/pkg/install"
 	agentInstaller "github.com/codefresh-io/argocd-listener/installer/pkg/install/handler"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/kube"
@@ -189,7 +190,10 @@ var installCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't install argocd agent: \"%s\"", err.Error()))
 		}
 
-		logger.Success(fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s", argoHost))
+		successMsg := fmt.Sprintf("Successfully installed codefresh gitops controller, host: %s", argoHost)
+		logger.Success(successMsg)
+		eventSender := cfEventSender.New(cfEventSender.EVENT_CONTROLLER_INSTALL)
+		eventSender.Success(successMsg)
 		return nil
 	},
 }
@@ -257,11 +261,8 @@ func init() {
 
 }
 
-func sendControllerInstalledEvent(status string, msg string) {
-
-}
-
 func failInstallation(msg string) error {
-	sendControllerInstalledEvent(FAILED, msg)
+	eventSender := cfEventSender.New(cfEventSender.EVENT_CONTROLLER_INSTALL)
+	eventSender.Fail(msg)
 	return errors.New(msg)
 }
