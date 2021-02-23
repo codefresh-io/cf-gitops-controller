@@ -219,6 +219,7 @@ func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstall
 
 	agentInstallOptions.Kube.ConfigPath = installCmdOptions.Kube.ConfigPath
 
+	agentInstallOptions.Codefresh.Provider = "codefresh"
 	agentInstallOptions.Codefresh.SyncMode = "CONTINUE_SYNC"
 	agentInstallOptions.Codefresh.Integration = "cf-gitops-controller"
 

@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.7 // indirect
-	github.com/codefresh-io/argocd-listener v0.0.0-20210222130151-d069585033f2
+	github.com/codefresh-io/argocd-listener v0.0.0-20210223143754-aff7505b78af
 	github.com/codefresh-io/argocd-sdk v0.2.5
 	github.com/codefresh-io/go-sdk v0.19.5
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
