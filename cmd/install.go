@@ -25,7 +25,6 @@ import (
 	"time"
 )
 
-var agentVersion = ""
 var FAILED = "FAILED"
 var installCmdOptions = install.CmdOptions{}
 
@@ -200,8 +199,6 @@ var installCmd = &cobra.Command{
 
 func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstallPkg.InstallCmdOptions {
 	var agentInstallOptions agentInstallPkg.InstallCmdOptions
-
-	agentInstallOptions.Agent.Version = agentVersion
 
 	agentInstallOptions.Argo.Host = installCmdOptions.Argo.Host
 	agentInstallOptions.Argo.Token = installCmdOptions.Argo.Token
