@@ -13,8 +13,8 @@ builds:
     env:
       - CGO_ENABLED=0
     ldflags:
-      - -X github.com/codefresh-io/argocd-listener/installer/cmd.version={{.Env.AGENT_VERSION}}
-      - -X github.com/codefresh-io/argocd-agent/installer/cmd.version={{.Env.AGENT_VERSION}}
+      - -X github.com/codefresh-io/argocd-listener/installer/cmd.version=77
+      - -X github.com/codefresh-io/argocd-agent/installer/cmd.version=77
       - -X github.com/codefresh-io/cf-gitops-controller/cmd.version={{.Version}}
       - -X github.com/codefresh-io/cf-gitops-controller/cmd.commit={{.Commit}}
       - -X github.com/codefresh-io/cf-gitops-controller/cmd.date={{.Date}}
