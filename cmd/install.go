@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-var FAILED = "FAILED"
+var agentVersion = ""
 var installCmdOptions = install.CmdOptions{}
 
 func retrieveArgoHost(kubeClient kube.Kube) (string, error) {
@@ -199,6 +199,8 @@ var installCmd = &cobra.Command{
 
 func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstallPkg.InstallCmdOptions {
 	var agentInstallOptions agentInstallPkg.InstallCmdOptions
+
+	agentInstallOptions.Agent.Version = agentVersion
 
 	agentInstallOptions.Argo.Host = installCmdOptions.Argo.Host
 	agentInstallOptions.Argo.Token = installCmdOptions.Argo.Token
