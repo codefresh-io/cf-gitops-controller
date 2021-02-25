@@ -15,8 +15,6 @@ import (
 	"path"
 )
 
-var updateCmdOptions = install.CmdOptions{}
-
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update gitops codefresh",
@@ -42,7 +40,7 @@ var updateCmd = &cobra.Command{
 			return failInstallation(fmt.Sprintf("Can't create namespace %s: \"%s\"", installCmdOptions.Kube.Namespace, err.Error()))
 		}
 
-		updateHandler := agentUpdater.New(initAgentUpdateOptions(&installCmdOptions), "")
+		updateHandler := agentUpdater.New(initAgentUpdateOptions(&installCmdOptions), agentVersion)
 		err = updateHandler.Run()
 		if err != nil {
 			return failUninstall(fmt.Sprintf("Can't update argocd agent: \"%s\"", err.Error()))
