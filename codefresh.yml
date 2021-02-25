@@ -23,11 +23,15 @@ steps:
   export_version:
     title: Compare version
     stage: build
-    image: codefresh/semver
+    image: 'golang:1.14'
     commands:
+      - go get ./...
       - export CF_GITOPS_VERSION=$(cat ./VERSION)
       - echo "Cf gitops version -> CF_GITOPS_VERSION "
       - cf_export VERSION=$CF_GITOPS_VERSION
+      - export CF_AGENT_VERSION=$(cat $GOPATH$(echo /pkg/mod/)$(go mod graph | grep -P 'github.com\/codefresh-io\/argocd-listener(.+)$' -o -m 1)/installer/VERSION)
+      - echo "Cf agent version -> CF_AGENT_VERSION "
+      - cf_export AGENT_VERSION=$CF_AGENT_VERSION
     when:
       steps:
         - name: main_clone
