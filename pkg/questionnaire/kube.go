@@ -29,7 +29,7 @@ func AskAboutKubeContext(installOptions *install.CmdOptions) error {
 
 func AskAboutManifest(installOptions *install.CmdOptions) error {
 	// dont need ask for now, customer can pass it use params
-	installOptions.Kube.ManifestPath = "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+	installOptions.Kube.ManifestPath = "https://raw.githubusercontent.com/codefresh-io/argo-cd/stable/manifests/install.yaml"
 	return nil
 	//return prompt.InputWithDefault(&installOptions.Kube.ManifestPath, "Install manifest path/url", "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml")
 }
