@@ -220,7 +220,6 @@ func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstall
 
 	agentInstallOptions.Codefresh.Provider = "codefresh"
 	agentInstallOptions.Codefresh.SyncMode = "CONTINUE_SYNC"
-	agentInstallOptions.Codefresh.Integration = "cf-gitops-controller"
 
 	return agentInstallOptions
 }
