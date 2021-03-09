@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.7 // indirect
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/codefresh-io/argocd-listener v0.0.0-20210226195440-2c54398588ea
 	github.com/codefresh-io/argocd-sdk v0.3.6
 	github.com/codefresh-io/go-sdk v0.19.5
