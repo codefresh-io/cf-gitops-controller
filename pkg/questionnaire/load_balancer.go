@@ -3,9 +3,9 @@ package questionnaire
 import (
 	"errors"
 	"fmt"
-	"github.com/codefresh-io/argocd-listener/installer/pkg/kube"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/prompt"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/kube"
 )
 
 func initLoadBalancer(kubeClient kube.Kube) error {
@@ -28,7 +28,7 @@ func AskAboutLoadBalancer(installOptions *install.CmdOptions, kubeClient kube.Ku
 		return initLoadBalancer(kubeClient)
 	}
 
-	_, loadBalancer := prompt.Confirm("Would you like to expose ArgoCD with LoadBalancer? ( This is required when using Codefresh steps )")
+	_, loadBalancer := prompt.NewPrompt().Confirm("Would you like to expose ArgoCD with LoadBalancer? ( This is required when using Codefresh steps )")
 	if loadBalancer {
 		return initLoadBalancer(kubeClient)
 	}

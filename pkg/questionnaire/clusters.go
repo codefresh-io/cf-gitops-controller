@@ -16,7 +16,7 @@ func AskAboutClusters(installOptions *install.CmdOptions, clusters []*codefresh.
 		clustersSelectors = append(clustersSelectors, cluster.Selector)
 	}
 
-	_, clustersForSync := prompt.Multiselect(clustersSelectors, "Select clusters your would be like to register")
+	_, clustersForSync := prompt.NewPrompt().Multiselect(clustersSelectors, "Select clusters your would be like to register")
 	installOptions.Codefresh.Clusters = clustersForSync
 	return nil
 }

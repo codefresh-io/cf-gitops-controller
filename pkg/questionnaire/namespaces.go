@@ -10,12 +10,12 @@ func AskAboutNamespace(installOptions *install.CmdOptions, kubeClient kube.Kube)
 	if installOptions.Kube.Namespace == "" {
 		namespaces, err := kubeClient.GetNamespaces()
 		if err != nil {
-			err = prompt.InputWithDefault(&installOptions.Kube.Namespace, "Kubernetes namespace to install", "default")
+			err = prompt.NewPrompt().InputWithDefault(&installOptions.Kube.Namespace, "Kubernetes namespace to install", "default")
 			if err != nil {
 				return err
 			}
 		} else {
-			err, selectedNamespace := prompt.Select(namespaces, "Select the namespace")
+			err, selectedNamespace := prompt.NewPrompt().Select(namespaces, "Select the namespace")
 			if err != nil {
 				return err
 			}
