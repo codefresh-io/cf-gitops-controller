@@ -3,10 +3,10 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	cfEventSender "github.com/codefresh-io/argocd-listener/installer/pkg/cf_event_sender"
-	agentInstallPkg "github.com/codefresh-io/argocd-listener/installer/pkg/install"
-	agentInstaller "github.com/codefresh-io/argocd-listener/installer/pkg/install/handler"
-	"github.com/codefresh-io/argocd-listener/installer/pkg/kube"
+	"github.com/codefresh-io/argocd-listener/agent/pkg/infra/store"
+	cfEventSender "github.com/codefresh-io/argocd-listener/installer/pkg/cfeventsender"
+	agentInstaller "github.com/codefresh-io/argocd-listener/installer/pkg/install"
+	agentInstallPkg "github.com/codefresh-io/argocd-listener/installer/pkg/install/entity"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/logger"
 	"github.com/codefresh-io/argocd-listener/installer/pkg/prompt"
 	argoSdk "github.com/codefresh-io/argocd-sdk/pkg/api"
@@ -14,6 +14,7 @@ import (
 	"github.com/codefresh-io/cf-gitops-controller/pkg/clusters"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/git"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/install"
+	"github.com/codefresh-io/cf-gitops-controller/pkg/kube"
 	"github.com/codefresh-io/cf-gitops-controller/pkg/questionnaire"
 	"github.com/codefresh-io/go-sdk/pkg/codefresh"
 	"github.com/janeczku/go-spinner"
@@ -62,6 +63,8 @@ var installCmd = &cobra.Command{
 				Token: installCmdOptions.Codefresh.Auth.Token,
 			},
 		})
+
+		store.SetCodefresh(installCmdOptions.Codefresh.Host, installCmdOptions.Codefresh.Auth.Token, "")
 
 		// kube context
 		_ = questionnaire.AskAboutKubeContext(&installCmdOptions)
@@ -140,7 +143,7 @@ var installCmd = &cobra.Command{
 		argoClientOptions = argoSdk.ClientOptions{Auth: argoSdk.AuthOptions{Token: token}, Host: argoHost}
 		argoApi = argoSdk.New(&argoClientOptions)
 
-		_, addClusters := prompt.Confirm("Would you like to integrate clusters from your account to ArgoCD?")
+		_, addClusters := prompt.NewPrompt().Confirm("Would you like to integrate clusters from your account to ArgoCD?")
 
 		if addClusters {
 			//clusters
@@ -156,7 +159,7 @@ var installCmd = &cobra.Command{
 			}
 		}
 
-		_, addManifestRepo := prompt.Confirm("Would you like to integrate git context for manifest repo from your account to ArgoCD?")
+		_, addManifestRepo := prompt.NewPrompt().Confirm("Would you like to integrate git context for manifest repo from your account to ArgoCD?")
 		if addManifestRepo {
 			// git repo
 			contexts, err := git.GetAvailableContexts(codefreshApi.Contexts())

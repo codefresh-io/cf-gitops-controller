@@ -38,6 +38,7 @@ func (tokenQuestion *ArgocdTokenQuestion) Ask() (string, error) {
 			logger.Warning(fmt.Sprintf("Getting argocd token failed, reason \"%v\", attempt %v ", err, n+1))
 			return retry.BackOffDelay(n, err, config)
 		}),
+		retry.Delay(5*time.Second),
 	)
 	return token, err
 }
