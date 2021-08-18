@@ -224,6 +224,9 @@ func initAgentInstallOptions(installCmdOptions *install.CmdOptions) agentInstall
 
 	agentInstallOptions.Kube.ConfigPath = installCmdOptions.Kube.ConfigPath
 
+	agentInstallOptions.Host.HttpProxy = installCmdOptions.Host.HttpProxy
+	agentInstallOptions.Host.HttpsProxy = installCmdOptions.Host.HttpsProxy
+
 	agentInstallOptions.Codefresh.Provider = "codefresh"
 	agentInstallOptions.Codefresh.SyncMode = "CONTINUE_SYNC"
 
@@ -261,6 +264,9 @@ func init() {
 
 	flags.StringVar(&installCmdOptions.Git.Integration, "git-integration", "", "Name of git integration in Codefresh")
 	flags.StringVar(&installCmdOptions.Git.RepoUrl, "git-repo-url", "", "Url to git manifest repo")
+
+	flags.StringVar(&installCmdOptions.Host.HttpProxy, "http-proxy", "", "Http proxy")
+	flags.StringVar(&installCmdOptions.Host.HttpsProxy, "https-proxy", "", "Https proxy")
 
 	flags.BoolVar(&installCmdOptions.Controller.LoadBalancer, "load-balancer", true, "Setup load balancer")
 
