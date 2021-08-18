@@ -10,6 +10,11 @@ type CmdOptions struct {
 		RepoUrl     string
 	}
 
+	Host struct {
+		HttpProxy  string
+		HttpsProxy string
+	}
+
 	Codefresh struct {
 		Host   string
 		Suffix string
